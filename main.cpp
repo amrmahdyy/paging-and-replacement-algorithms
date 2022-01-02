@@ -4,6 +4,7 @@
 #include<map>
 #include <string>
 #include <queue>
+#include<unordered_set>
 using namespace std;
 
 vector<int>buffer;
@@ -86,11 +87,57 @@ void fifo(){
         cout<<""<<endl;
         //cout<<""<<endl;
     }
-    printNumberOfFaults();
+
 }
+int getLru(vector<int>page,int index,int size){
+    int lruVal=0;
+    set<int>set;
+    for(int i=index-1;i>=0;i--){
+        if(set.size()==size){
+            break;
+        }
+        else {
+            lruVal = page[i];
+            set.insert(page[i]);
+        }
+    }
+    return lruVal;
+}
+void lru(){
+    vector<int>contentOfFrame;
+    string status="";
+    for(int i=0;i<buffer.size();i++){
+        int page=buffer[i];
+        if(std::find(contentOfFrame.begin(), contentOfFrame.end(), page)==contentOfFrame.end()) {
+            if (contentOfFrame.size() == nPages) {
+                // first element in vector will be the least recently used
+                int leastUsed = getLru(buffer,i,nPages);
+                status = "F";
+                numOfPageFaults++;
+                int lUIndexInContent =
+                        find(contentOfFrame.begin(), contentOfFrame.end(), leastUsed) - contentOfFrame.begin();
+                contentOfFrame[lUIndexInContent] = page;
+            } else {
+                contentOfFrame.push_back(page);
+                 status=" ";
+            }
+        }
+        else status=" ";
+        printVectorInline(page,contentOfFrame,status);
+        cout<<""<<endl;
+
+    }
+}
+
 int main() {
+//    vector<int>pa{7,3,1,9,5,3};
+//    cout<<getLru(pa,4,3)<<endl;
+//  //  cout<<*set.begin()<<endl;
     readInputs();
     printHeader();
+
     if(algo=="FIFO")fifo();
+    else if(algo=="LRU")lru();
+    printNumberOfFaults();
     return 0;
 }
