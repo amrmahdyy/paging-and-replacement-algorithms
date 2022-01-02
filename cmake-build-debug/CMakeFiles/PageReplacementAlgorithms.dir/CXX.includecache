@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/test/Desktop/Term 7/Operating System/Labs/PageReplacementAlgorithms/main.cpp
+iostream
+-
+vector
+-
+set
+-
+map
+-
+string
+-
+queue
+-
+
