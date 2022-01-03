@@ -52,10 +52,70 @@ void readInputs(){
         buffer.push_back(n);
         cin>>n;
     }
- //   printVector(buffer);
 
 }
-
+vector<int> findOptimal(int l,vector<int>contentOfFrame,vector<int>buf,int numPages){
+    vector<int>optimalVector;
+    for(int i=l;i<buf.size();i++){
+        if(optimalVector.size()!=numPages){
+            // make sure that the optimal exists in the contentOfFrame
+            if(find(contentOfFrame.begin(), contentOfFrame.end(), buf[i])!=contentOfFrame.end()){
+                if(find(optimalVector.begin(), optimalVector.end(), buf[i])==optimalVector.end()){
+                    optimalVector.push_back(buf[i]);
+                }
+            }
+        }
+    }
+    return optimalVector;
+}
+vector<int> getDifference(vector<int>contFrame,vector<int>future){
+    vector<int>difference;
+    for(int i=0;i<contFrame.size();i++){
+        int contFrameVal=contFrame[i];
+        bool inside=false;
+        for(int j=0;j<future.size();j++){
+            int futureVal=future[j];
+            if(futureVal==contFrameVal){
+                inside=true;
+                break;
+            }
+        }
+        if(!inside)difference.push_back(contFrameVal);
+    }
+    return difference;
+}
+void optimal(){
+    vector<int>contentOfFrame;
+    queue<int>queue;
+    string status="";
+    for(int i=0;i<buffer.size();i++){
+        int page=buffer[i];
+        if(find(contentOfFrame.begin(), contentOfFrame.end(), page)==contentOfFrame.end()){
+            // find optimal that will be replaced
+            if(contentOfFrame.size()==nPages){
+                vector<int>optVec= findOptimal(i+1,contentOfFrame,buffer,nPages);
+                int optVal;
+                if(optVec.size()!=nPages){
+                    optVal= getDifference(contentOfFrame,optVec)[0];
+                }
+                else
+                 optVal=optVec[optVec.size()-1];
+                // get index of the optimal in contentOfFrame
+               int optIndexInFrame=find(contentOfFrame.begin(), contentOfFrame.end(), optVal)-contentOfFrame.begin();
+               contentOfFrame[optIndexInFrame]=page;
+               status="F";
+               numOfPageFaults++;
+            }
+            else{
+                contentOfFrame.push_back(page);
+                status=" ";
+            }
+        }
+        else status=" ";
+        printVectorInline(page,contentOfFrame,status);
+        cout<<""<<endl;
+    }
+}
 void fifo(){
     // intialize queue
     queue<int>queue;
@@ -85,7 +145,6 @@ void fifo(){
         else status=" ";
         printVectorInline(page,contentOfFrame,status);
         cout<<""<<endl;
-        //cout<<""<<endl;
     }
 
 }
@@ -130,14 +189,11 @@ void lru(){
 }
 
 int main() {
-//    vector<int>pa{7,3,1,9,5,3};
-//    cout<<getLru(pa,4,3)<<endl;
-//  //  cout<<*set.begin()<<endl;
     readInputs();
     printHeader();
-
     if(algo=="FIFO")fifo();
     else if(algo=="LRU")lru();
+    else if(algo=="OPTIMAL")optimal();
     printNumberOfFaults();
     return 0;
 }
