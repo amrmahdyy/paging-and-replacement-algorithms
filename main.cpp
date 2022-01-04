@@ -187,6 +187,46 @@ void lru(){
 
     }
 }
+int findUnused(int pointer,vector<int>&bits){
+   while(bits[pointer%nPages]!=0){
+       bits[pointer%nPages]=0;
+       pointer=(pointer%nPages)+1;
+   }
+    return pointer;
+}
+void clockReplacement(){
+    vector<int>contentOfFrame;
+    vector<int>bits;
+    int pointer=0;
+    string status="";
+    for(int i=0;i<buffer.size();i++){
+        int page=buffer[i];
+        if(std::find(contentOfFrame.begin(), contentOfFrame.end(), page)==contentOfFrame.end()){
+            if(contentOfFrame.size()==nPages){
+                pointer= findUnused(pointer,bits);
+                contentOfFrame[pointer%nPages]=page;
+                bits[pointer%nPages]=1;
+                pointer++;
+                status="F";
+                numOfPageFaults++;
+            }
+            else{
+                contentOfFrame.push_back(page);
+                bits.push_back(1);
+                pointer++;
+                status=" ";
+            }
+        }
+
+        else {
+           int hitIndex=find(contentOfFrame.begin(), contentOfFrame.end(), page)-contentOfFrame.begin();
+            bits[hitIndex]=1;
+            status = " ";
+        }
+        printVectorInline(page,contentOfFrame,status);
+        cout<<""<<endl;
+    }
+}
 
 int main() {
     readInputs();
@@ -194,6 +234,7 @@ int main() {
     if(algo=="FIFO")fifo();
     else if(algo=="LRU")lru();
     else if(algo=="OPTIMAL")optimal();
+    else if(algo=="CLOCK")clockReplacement();
     printNumberOfFaults();
     return 0;
 }
